@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Bitter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="auth-container elevated-3d">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="logo.png" style="width: 80px; height: 80px; object-fit: contain;">
+            <h1 id="form-title" style="margin-top: 20px;">Log in to Bitter</h1>
+        </div>
+
+        <form id="auth-form">
+            <input type="text" id="username" class="auth-input" placeholder="Username" required autocomplete="username">
+            <input type="password" id="password" class="auth-input" placeholder="Password" required autocomplete="current-password">
+            <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Log in</button>
+        </form>
+
+        <div style="margin-top: 25px; text-align: center; font-size: 14px; color: var(--text-muted);">
+            <span id="toggle-mode" class="text-link" style="color: var(--primary); cursor: pointer;">Don't have an account? Sign up</span>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+                <button onclick="localStorage.setItem('token', 'demo'); localStorage.setItem('username', 'DemoUser'); window.location.href='index.html';" 
+                        class="btn btn-outline" style="width: 100%; font-size: 13px;">
+                    ✨ Preview New 3D Design (No Login)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="app.js"></script>
+</body>
+</html>

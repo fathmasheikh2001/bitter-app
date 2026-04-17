@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitter App - Comprehensive 10-Slide Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d12;
+            --surface: #16161e;
+            --accent: #7aa2f7;
+            --accent-glow: rgba(122, 162, 247, 0.4);
+            --text-primary: #c0caf5;
+            --text-secondary: #9aa5ce;
+            --border: rgba(122, 162, 247, 0.15);
+            --card-radius: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Slide System */
+        .presentation-container {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #1a1b26 0%, #0d0d12 100%);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95) translateY(20px);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+        }
+
+        .content-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 3.5rem;
+            max-width: 1100px;
+            width: 95%;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -3px;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        p {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .step-tag {
+            background: var(--accent);
+            color: var(--bg);
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .grid-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            background: rgba(122, 162, 247, 0.05);
+        }
+
+        .grid-item h4 {
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        li::before {
+            content: '✦';
+            color: var(--accent);
+        }
+
+        .diagram-box {
+            background: #000;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            margin-top: 1rem;
+            width: 100%;
+            height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .diagram-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 3rem;
+            right: 3rem;
+            display: flex;
+            gap: 1.5rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            width: 70px;
+            height: 70px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            font-size: 1.4rem;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .progress-indicator {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+            transition: width 0.4s ease;
+        }
+
+        .counter {
+            position: fixed;
+            bottom: 3rem;
+            left: 3rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            background: var(--surface);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            background: rgba(122, 162, 247, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="content-card">
+                <h1>BITTER</h1>
+                <h3>Detailed Architectural Overview & Execution Plan</h3>
+                <p>A professional-grade Twitter clone built on a resilient 3-tier AWS infrastructure, delivering real-time social networking at scale.</p>
+                <div style="margin-top: 2rem; color: var(--accent); font-weight: 600;">System Architect Presentation</div>
+            </div>
+        </div>
+
+        <!-- Slide 2: About the App -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>About the Application</h2>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>Real-Time Communication</h4>
+                        <p style="font-size: 1rem;">Users can instantaneously publish "Tweets" up to 280 characters, visible to a global community via a chronological feed.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>Social Graphing</h4>
+                        <p style="font-size: 1rem;">A robust follow/unfollow system allowing users to build a curated network and personalized content stream.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>Secure Identities</h4>
+                        <p style="font-size: 1rem;">End-to-end security with JWT-based session management and military-grade Bcrypt password hashing.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>Elite Performance</h4>
+                        <p style="font-size: 1rem;">Zero-dependency frontend and optimized MySQL query engine ensuring sub-second response times.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 3-Tier Architecture -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>3-Tier System Design</h2>
+                <p>Ensuring separation of concerns for maximum maintainability and scalability.</p>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>Web Presentation Tier</h4>
+                        <p style="font-size: 0.9rem;">Static assets (HTML5, CSS3, Vanilla JS) hosted on <strong>Amazon S3</strong> for ultra-low latency globally.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>Application Logic Tier</h4>
+                        <p style="font-size: 0.9rem;">Node.js and Express.js REST API running on <strong>Amazon EC2</strong>, handling business rules and authentication.</p>
+                    </div>
+                    <div class="grid-item" style="grid-column: span 2;">
+                        <h4>Data Persistence Tier</h4>
+                        <p style="font-size: 0.9rem;"><strong>Amazon RDS (MySQL)</strong> providing a secure, highly available relational data store with automated backups and encryption.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: AWS Diagram -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>Architecture Diagram</h2>
+                <div class="diagram-box">
+                    <img src="./aws_diagram.png" alt="Professional AWS Architecture">
+                </div>
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--accent);">Visual Flow: User → S3 | User → ALB → EC2 → RDS</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: AWS Services Deep-Dive -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>AWS Cloud Infrastructure</h2>
+                <ul>
+                    <li><strong>Amazon S3:</strong> Leveraged for high-durability static website hosting, offloading compute from the app tier.</li>
+                    <li><strong>Application Load Balancer (ALB):</strong> Acts as the single point of entry, health-checking EC2 instances and distributing traffic.</li>
+                    <li><strong>Amazon EC2:</strong> Virtual servers running the Node.js environment, managed with Elastic IPs for reliable connectivity.</li>
+                    <li><strong>Amazon RDS:</strong> Managed MySQL instance that automates patching, backups, and failover support.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 6: Network & Security -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>Networking & Security</h2>
+                <p>The foundation of a secure cloud environment.</p>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>Virtual Private Cloud (VPC)</h4>
+                        <p style="font-size: 0.9rem;">Establishing a private, isolated network space on AWS with custom IP address ranges, subnets, and routing tables.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>Security Groups</h4>
+                        <p style="font-size: 0.9rem;">Operating as stateful virtual firewalls for instances, strictly controlling inbound traffic (e.g., allowing HTTP on port 80 and DB on 3306).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Data Architecture -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>Relational Schema Design</h2>
+                <div class="grid">
+                    <div class="grid-item">
+                        <h4>Users Table</h4>
+                        <p style="font-size: 0.8rem;">Attributes: <code>id</code>, <code>username</code>, <code>password_hash</code>, <code>created_at</code>. Primary record for identity.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h4>Tweets Table</h4>
+                        <p style="font-size: 0.8rem;">Attributes: <code>id</code>, <code>user_id</code> (FK), <code>content</code>, <code>created_at</code>. Stores micro-blog entries.</p>
+                    </div>
+                    <div class="grid-item" style="grid-column: span 2;">
+                        <h4>Followers Table</h4>
+                        <p style="font-size: 0.8rem;">Attributes: <code>follower_id</code> (FK), <code>following_id</code> (FK), <code>created_at</code>. A junction table enabling the social network connections.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Implementation (Phase 1) -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>Execution: Steps 1 - 4</h2>
+                <div class="grid">
+                    <div class="grid-item">
+                        <span class="step-tag">Step 1</span>
+                        <h4>VPC & Network Setup</h4>
+                        <p style="font-size: 0.8rem;">Provisioning the VPC, creating Public/Private subnets, and attaching an Internet Gateway for external access.</p>
+                    </div>
+                    <div class="step-item" style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px;">
+                        <span class="step-tag">Step 2</span>
+                        <h4>Database Provisioning</h4>
+                        <p style="font-size: 0.8rem;">Launching the RDS MySQL instance in a private subnet, guarded by a DB-Security Group.</p>
+                    </div>
+                    <div class="grid-item">
+                        <span class="step-tag">Step 3</span>
+                        <h4>Backend Engineering</h4>
+                        <p style="font-size: 0.8rem;">Developing the Node.js API, implementing JWT Auth, and establishing the database connection pool.</p>
+                    </div>
+                    <div class="grid-item">
+                        <span class="step-tag">Step 4</span>
+                        <h4>EC2 Initialization</h4>
+                        <p style="font-size: 0.8rem;">Launching the EC2 instance, installing Git/Node.js, and deploying the backend via PM2.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Implementation (Phase 2) -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>Execution: Steps 5 - 7</h2>
+                <div class="grid">
+                    <div class="grid-item">
+                        <span class="step-tag">Step 5</span>
+                        <h4>S3 Static Deployment</h4>
+                        <p style="font-size: 0.8rem;">Uploading the optimized frontend to an S3 bucket and configuring it for Static Website Hosting.</p>
+                    </div>
+                    <div class="grid-item">
+                        <span class="step-tag">Step 6</span>
+                        <h4>ALB Configuration</h4>
+                        <p style="font-size: 0.8rem;">Setting up the Application Load Balancer to target the EC2 cluster and manage security group traffic.</p>
+                    </div>
+                    <div class="step-item" style="grid-column: span 2; padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px;">
+                        <span class="step-tag">Step 7</span>
+                        <h4>Integration & UX Test</h4>
+                        <p style="font-size: 0.8rem;">Connecting the frontend to the CloudFront/ALB endpoint and performing full user-lifecycle validation (Signup → Tweet → Feed).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Conclusion -->
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <h2>Production-Ready Architecture</h2>
+                <p>The Bitter App is built for the professional cloud.</p>
+                <div style="display: flex; justify-content: space-around; margin: 2rem 0;">
+                    <div><h4 style="color: var(--accent);">Highly Available</h4></div>
+                    <div><h4 style="color: var(--accent);">Secure by Design</h4></div>
+                    <div><h4 style="color: var(--accent);">Scalable</h4></div>
+                </div>
+                <h1 style="font-size: 3rem; margin-top: 2rem;">READY FOR DEPLOY</h1>
+                <p style="color: var(--accent); font-weight: 700;">Final Review Completed</p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-controls">
+            <div class="nav-btn" id="prevBtn">←</div>
+            <div class="nav-btn" id="nextBtn">→</div>
+        </div>
+
+        <div class="progress-indicator" id="progress"></div>
+        <div class="counter" id="counter">Slide 1 / 10</div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progress');
+        const counter = document.getElementById('counter');
+
+        let currentSlide = 0;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            const prog = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = prog + '%';
+            counter.innerText = `Slide ${currentSlide + 1} / ${slides.length}`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
