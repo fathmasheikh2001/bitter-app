@@ -1,6 +1,6 @@
 // 🚀 DEPLOYMENT CONFIGURATION
 // Update the IP below whenever you launch a new EC2 instance!
-const API_URL = 'http://13.201.222.144:3000/api'; 
+const API_URL = 'http://Bitter-app-ALB-1825565459.ap-south-1.elb.amazonaws.com/api'; 
 let followingList = [];
 let currentTab = 'global';
 
