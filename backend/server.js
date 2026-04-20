@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3001;
+const PORT = 3001; // Hardcoded to 3001 to bypass port 3000 issues
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
 
 // Health Check for ALB
