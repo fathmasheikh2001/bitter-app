@@ -15,6 +15,16 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
 
+// Health Check for ALB
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'OK', uptime: process.uptime() });
+});
+
+// Root route for default AWS Health Check
+app.get('/', (req, res) => {
+    res.status(200).send('Bitter Backend is Online');
+});
+
 // Database connection pool
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
