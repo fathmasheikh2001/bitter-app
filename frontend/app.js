@@ -13,6 +13,12 @@ function logout() {
     window.location.href = 'auth.html';
 }
 
+function showProfile(username) {
+    if (!username) username = getUsername();
+    window.location.href = `profile.html?user=${username}`;
+}
+
+
 function showToast(message) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -282,6 +288,7 @@ async function saveProfile() {
             initProfile(getUsername());
         }
     } catch (e) {
+        console.error("Profile Save Error:", e);
         showToast("Error updating profile");
     }
 }
@@ -305,6 +312,10 @@ function setupGlobalListeners() {
                 document.getElementById('tweet-input').value = '';
                 showToast("Post sent!");
                 loadFeed();
+            } else {
+                const errData = await res.json();
+                console.error("Post Error:", errData);
+                showToast(errData.error || "Failed to post");
             }
         };
     }

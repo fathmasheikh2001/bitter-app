@@ -163,7 +163,7 @@ app.get('/api/feed', async (req, res) => {
         const [tweets] = await pool.query(query);
         res.json(tweets);
     } catch (error) {
-        console.error(error);
+        console.error("GET /api/feed Error:", error);
         res.status(500).json({ error: 'Database error or Invalid token' });
     }
 });
