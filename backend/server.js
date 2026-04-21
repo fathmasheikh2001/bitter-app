@@ -36,6 +36,39 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// --- Stability & Debugging ---
+
+// 1. Database Connection Test
+async function checkConnection() {
+    try {
+        const connection = await pool.getConnection();
+        console.log('✅ Connected to RDS Database successfully');
+        const [rows] = await connection.query('SELECT 1');
+        connection.release();
+    } catch (err) {
+        console.error('❌ DATABASE CONNECTION FAILED!');
+        console.error('Error Details:', err.code, err.message);
+        console.error('HINT: Check if your .env file matches your RDS credentials.');
+        console.error('HINT: Check if your RDS Security Groups allow traffic from this EC2.');
+        process.exit(1);
+    }
+}
+checkConnection();
+
+// 2. Global Error Handlers (Prevents silent crashes)
+process.on('uncaughtException', (err) => {
+    console.error('🔥 UNCAUGHT EXCEPTION! Shutting down...');
+    console.error(err.name, err.message);
+    console.error(err.stack);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('💥 UNHANDLED REJECTION! Shutting down...');
+    console.error(err.name, err.message);
+    process.exit(1);
+});
+
 // S3 Configuration
 const s3 = new S3Client({
     region: process.env.AWS_REGION || 'ap-south-1',
@@ -302,6 +335,16 @@ app.put('/api/user/profile', authenticateToken, upload.single('profilePic'), asy
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+    console.log(`🚀 Server initialized and running on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`❌ FATAL ERROR: Port ${PORT} is already in use.`);
+        console.error('SOLUTION: Run "sudo lsof -i :3001" to find the process ID (PID), then "sudo kill -9 <PID>".');
+    } else {
+        console.error('❌ FATAL SERVER ERROR:', err);
+    }
+    process.exit(1);
 });
