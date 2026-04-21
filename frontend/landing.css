@@ -165,7 +165,19 @@ footer a:hover {
 
 @media (max-width: 1100px) {
     .split-layout { flex-direction: column; }
-    .banner { min-height: 40vh; }
-    h1 { font-size: 55px; }
-    .contentArea { padding: 40px; }
+    .banner { min-height: 30vh; border-bottom: 1px solid var(--border); }
+    .banner img { width: 180px !important; height: 180px !important; }
+    h1 { font-size: 48px; margin: 20px 0; }
+    h2 { font-size: 28px; margin-bottom: 25px; }
+    .contentArea { padding: 40px 20px; max-width: 100%; align-items: center; text-align: center; }
+    .auth-buttons { width: 100%; max-width: 320px; }
+    .features { margin-top: 50px; flex-direction: column; gap: 30px; text-align: center; }
+    .already-account { margin-top: 30px; }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 36px; }
+    h2 { font-size: 22px; }
+    .banner { min-height: 25vh; }
+    .banner img { width: 140px !important; height: 140px !important; }
 }

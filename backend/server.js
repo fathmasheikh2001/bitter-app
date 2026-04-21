@@ -49,7 +49,7 @@ const upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: process.env.S3_BUCKET_NAME || 'bitter-app-uploads',
-        acl: 'public-read',
+        // Removed acl: 'public-read' to avoid issues with buckets that disable ACLs
         metadata: (req, file, cb) => {
             cb(null, { fieldName: file.fieldname });
         },
@@ -274,15 +274,30 @@ app.put('/api/user/profile', authenticateToken, upload.single('profilePic'), asy
     const profilePicUrl = req.file ? req.file.location : null;
 
     try {
-        if (profilePicUrl && bio) {
-            await pool.query('UPDATE users SET bio = ?, profile_pic_url = ? WHERE id = ?', [bio, profilePicUrl, req.user.id]);
-        } else if (profilePicUrl) {
-            await pool.query('UPDATE users SET profile_pic_url = ? WHERE id = ?', [profilePicUrl, req.user.id]);
-        } else if (bio) {
-            await pool.query('UPDATE users SET bio = ? WHERE id = ?', [bio, req.user.id]);
+        let query = 'UPDATE users SET ';
+        let params = [];
+        let updates = [];
+
+        if (bio !== undefined) {
+            updates.push('bio = ?');
+            params.push(bio);
         }
+        if (profilePicUrl) {
+            updates.push('profile_pic_url = ?');
+            params.push(profilePicUrl);
+        }
+
+        if (updates.length === 0) {
+            return res.json({ message: 'No changes provided' });
+        }
+
+        query += updates.join(', ') + ' WHERE id = ?';
+        params.push(req.user.id);
+
+        await pool.query(query, params);
         res.json({ message: 'Profile updated successfully', profilePicUrl });
     } catch (error) {
+        console.error("Profile Update Error:", error);
         res.status(500).json({ error: 'Database error' });
     }
 });

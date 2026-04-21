@@ -214,41 +214,49 @@ async function toggleFollow(id, isFollowing) {
 
 // --- Search ---
 let searchTimeout;
-function handleSearch(q) {
+function handleSearch(q, isMobile = false) {
     clearTimeout(searchTimeout);
-    const container = document.getElementById('search-results');
-    const list = document.getElementById('results-list');
+    const containerId = isMobile ? 'mobile-search-results' : 'search-results';
+    const listId = isMobile ? 'mobile-results-list' : 'results-list';
     
+    const container = document.getElementById(containerId);
+    const list = document.getElementById(listId);
+    
+    if (!container || !list) return;
     if (!q) { container.style.display = 'none'; return; }
 
     searchTimeout = setTimeout(async () => {
-        const response = await fetch(`${API_URL}/users/search?q=${q}`);
-        const users = await response.json();
-        
-        container.style.display = 'block';
-        list.innerHTML = '';
-        
-        if (users.length === 0) {
-            list.innerHTML = '<div style="padding: 10px; font-size: 14px; color: var(--text-muted);">No users found</div>';
-            return;
-        }
+        try {
+            const response = await fetch(`${API_URL}/users/search?q=${q}`);
+            const users = await response.json();
+            
+            container.style.display = 'block';
+            list.innerHTML = '';
+            
+            if (users.length === 0) {
+                list.innerHTML = '<div style="padding: 10px; font-size: 14px; color: var(--text-muted);">No users found</div>';
+                return;
+            }
 
-        users.forEach(user => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item';
-            item.style.cursor = 'pointer';
-            item.onclick = () => window.location.href = `profile.html?user=${user.username}`;
-            item.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="${user.profile_pic_url || 'https://bitter-app-uploads.s3.ap-south-1.amazonaws.com/default-avatar.png'}" class="avatar" style="width: 36px; height: 36px;">
-                    <div>
-                        <div style="font-weight: bold; font-size: 14px;">${user.username}</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">@${user.username}</div>
+            users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.style.cursor = 'pointer';
+                item.onclick = () => window.location.href = `profile.html?user=${user.username}`;
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${user.profile_pic_url || 'https://bitter-app-uploads.s3.ap-south-1.amazonaws.com/default-avatar.png'}" class="avatar" style="width: 36px; height: 36px;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 14px;">${user.username}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">@${user.username}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-            list.appendChild(item);
-        });
+                `;
+                list.appendChild(item);
+            });
+        } catch (e) {
+            console.error("Search Error:", e);
+        }
     }, 300);
 }
 
@@ -283,13 +291,24 @@ async function saveProfile() {
         const data = await response.json();
         if (response.ok) {
             showToast("Profile Updated!");
-            if (data.profilePicUrl) localStorage.setItem('profile_pic', data.profilePicUrl);
+            if (data.profilePicUrl) {
+                localStorage.setItem('profile_pic', data.profilePicUrl);
+                // Update all instances of user avatar on current page
+                document.querySelectorAll('.avatar[src*="default-avatar"], #current-user-avatar').forEach(img => {
+                    if (img.id === 'current-user-avatar' || img.closest('.tweet-body') === null) {
+                        img.src = data.profilePicUrl;
+                    }
+                });
+            }
             closeEditModal();
             initProfile(getUsername());
+        } else {
+            showToast(data.error || "Failed to update profile");
+            console.error("Save Error Response:", data);
         }
     } catch (e) {
         console.error("Profile Save Error:", e);
-        showToast("Error updating profile");
+        showToast("Error connecting to server");
     }
 }
 
@@ -322,7 +341,12 @@ function setupGlobalListeners() {
 
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
-        searchInput.oninput = (e) => handleSearch(e.target.value);
+        searchInput.oninput = (e) => handleSearch(e.target.value, false);
+    }
+
+    const mobileSearchInput = document.getElementById('mobile-search-input');
+    if (mobileSearchInput) {
+        mobileSearchInput.oninput = (e) => handleSearch(e.target.value, true);
     }
 
     const authForm = document.getElementById('auth-form');
