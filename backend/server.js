@@ -342,6 +342,15 @@ app.put('/api/user/profile', authenticateToken, upload.single('profilePic'), asy
     }
 });
 
+// Global Error Handler to ensure JSON responses
+app.use((err, req, res, next) => {
+    console.error("Backend Error:", err);
+    res.status(err.status || err.statusCode || 500).json({
+        error: err.message || 'Internal Server Error',
+        code: err.code || 'UNKNOWN_ERROR'
+    });
+});
+
 const server = app.listen(PORT, () => {
     console.log(`🚀 Server initialized and running on port ${PORT}`);
 });
