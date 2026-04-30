@@ -70,13 +70,20 @@ process.on('unhandledRejection', (err) => {
 });
 
 // S3 Configuration
-const s3 = new S3Client({
+const s3Config = {
     region: process.env.AWS_REGION || 'ap-south-1',
-    credentials: {
+};
+
+// Only add credentials if explicitly set in .env. 
+// Otherwise, let the SDK automatically use the EC2 IAM Role!
+if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    s3Config.credentials = {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    }
-});
+    };
+}
+
+const s3 = new S3Client(s3Config);
 
 const upload = multer({
     storage: multerS3({
